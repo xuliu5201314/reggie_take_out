@@ -1,6 +1,7 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.DishDto;
@@ -131,45 +132,6 @@ public class DishController {
 
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish){
-/*
-        // 查询构造器
-        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(dish.getCategoryId() != null,Dish::getCategoryId,dish.getCategoryId());
-        queryWrapper.eq(Dish::getStatus,1);  // 启售卖
-
-        // 添加排序条件
-        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
-
-        List<Dish> dishList = dishService.list(queryWrapper);
-
-        List<DishDto> dishDtoList = new ArrayList<>();
-
-        for(Dish record:dishList){
-            DishDto dishDto = new DishDto();
-            Long categoryId = record.getCategoryId();
-            Category category = categoryService.getById(categoryId);
-
-            if (category != null){
-                String categoryName = category.getName();
-                dishDto.setCategoryName(categoryName);
-            }
-
-            // 查询口味
-            Long dishId = record.getId();
-            LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            lambdaQueryWrapper.eq(DishFlavor::getDishId,dishId);
-            List<DishFlavor> dishFlavorList = dishFlavorService.list(lambdaQueryWrapper);
-
-            // 封装到dto中
-            dishDto.setFlavors(dishFlavorList);
-
-            BeanUtils.copyProperties(record,dishDto);
-
-            dishDtoList.add(dishDto);
-        }
-
-        return R.success(dishDtoList);
-    }*/
         //构造查询条件
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(dish.getCategoryId() != null ,Dish::getCategoryId,dish.getCategoryId());
@@ -206,6 +168,17 @@ public class DishController {
         }).collect(Collectors.toList());
 
         return R.success(dishDtoList);
+    }
+
+    @PostMapping("/status/{status}")
+    public R<String> updateStatus(@PathVariable int status,Long[] ids){
+
+        LambdaUpdateWrapper<Dish> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.set(Dish::getStatus,status);
+        updateWrapper.in(Dish::getId,ids);
+
+        dishService.update(updateWrapper);
+        return R.success("更新成功！");
     }
 
 }
