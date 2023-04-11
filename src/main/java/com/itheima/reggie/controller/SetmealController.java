@@ -149,7 +149,6 @@ public class SetmealController {
     public R<String> delete(@RequestParam List<Long> ids){
 
         setmealService.removeWithDish(ids);
-
         return R.success("删除成功！");
     }
 
