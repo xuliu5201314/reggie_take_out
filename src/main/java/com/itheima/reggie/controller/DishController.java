@@ -113,17 +113,14 @@ public class DishController {
     }
 
     /**
-     * 根据id删除菜品和口味
+     * 根据id删除菜品和口味(单删批量删除)
      * @param ids
      * @return
      */
     @DeleteMapping
     public R<String> delete(@RequestParam List<Long> ids){
-
-        /*dishService.removeWithFlavor(ids);
-        return R.success("删除成功！");*/
-        System.out.println(ids);
-        return null;
+        dishService.removeWithFlavor(ids);
+        return R.success("删除成功！");
     }
 
     /**
@@ -131,20 +128,7 @@ public class DishController {
      * @param dish
      * @return
      */
-    /*@GetMapping("/list")
-    public R<List<Dish>> list(Dish dish){
 
-        // 查询构造器
-        LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(dish.getCategoryId() != null,Dish::getCategoryId,dish.getCategoryId());
-        queryWrapper.eq(Dish::getStatus,1);  // 启售卖
-
-        // 添加排序条件
-        queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
-        List<Dish> dishList = dishService.list(queryWrapper);
-
-        return R.success(dishList);
-    }*/
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish){
 /*

@@ -2,6 +2,7 @@ package com.itheima.reggie.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.itheima.reggie.common.CustomerException;
 import com.itheima.reggie.dto.DishDto;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 
@@ -110,22 +110,24 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Override
     @Transactional
     public void removeWithFlavor(List<Long> ids) {
+
         // 查询菜品是否在售
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.in(Dish::getId,ids);
-        queryWrapper.eq(Dish::getStatus,0);
+        queryWrapper.in(Dish::getStatus,1);
+
         int count = this.count(queryWrapper);
         if (count > 0){
             throw new CustomerException("当前有在售菜品，不可删除！");
         }
 
-        // 删除菜品
-        this.removeWithFlavor(ids);
+        // 先删除口味表
+        LambdaQueryWrapper<DishFlavor> flavorWrapper = new LambdaQueryWrapper<>();
+        flavorWrapper.in(DishFlavor::getDishId,ids);
+        dishFlavorService.remove(flavorWrapper);
 
-        // 删除口味
-        LambdaQueryWrapper<DishFlavor> wrapper = new LambdaQueryWrapper<>();
-        wrapper.in(DishFlavor::getDishId,ids);
-        dishFlavorService.remove(wrapper);
+        // 在删除菜品表
+        this.removeByIds(ids);
 
     }
 }
