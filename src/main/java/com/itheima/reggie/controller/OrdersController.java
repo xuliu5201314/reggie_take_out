@@ -1,6 +1,7 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.OrdersDto;
@@ -8,6 +9,7 @@ import com.itheima.reggie.entity.OrderDetail;
 import com.itheima.reggie.entity.Orders;
 import com.itheima.reggie.service.OrderDetailService;
 import com.itheima.reggie.service.OrdersService;
+import com.itheima.reggie.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class OrdersController {
 
     @Autowired
     private OrderDetailService orderDetailService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/submit")
     public R<String> submit(@RequestBody Orders orders){
@@ -73,5 +78,42 @@ public class OrdersController {
         dtoPage.setRecords(ordersDtoList);
 
         return R.success(dtoPage);
+    }
+
+    @GetMapping("/page")
+    public R<Page> page(int page,int pageSize,Long number,String beginTime,String endTime){
+        Page<Orders> ordersPage = new Page<>(page,pageSize);
+        Page<OrdersDto> ordersDtoPage = new Page<>();
+        LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
+
+        // 添加订单号 和时间范围的查询条件
+        if (number != null){
+            queryWrapper.eq(Orders::getNumber,number);
+        } else if (beginTime != null && endTime != null){
+            queryWrapper.between(Orders::getOrderTime,beginTime,endTime);
+        }
+
+        queryWrapper.orderByDesc(Orders::getCheckoutTime);
+
+        ordersService.page(ordersPage,queryWrapper);
+
+        // 获取orders对象
+        List<Orders> orders = ordersPage.getRecords();
+
+        // 遍历orders对象集合，获取userid，然后根据userId获取userName
+
+        List<OrdersDto> ordersDtos = new ArrayList<>();
+        for (Orders order: orders){
+            Long userId = order.getUserId();
+            String name = userService.getById(userId).getName();
+            OrdersDto ordersDto = new OrdersDto();
+            BeanUtils.copyProperties(order,ordersDto);
+            ordersDto.setUserName(name);
+            ordersDtos.add(ordersDto);
+        }
+
+        ordersDtoPage.setRecords(ordersDtos);
+
+        return R.success(ordersDtoPage);
     }
 }
