@@ -116,9 +116,13 @@ public class DishController {
 
         dishService.updateWithFlavor(dishDto);
 
-        // 清理菜品缓存数据
+        /*// 清理所有菜品缓存数据
         Set keys = redisTemplate.keys("dish_*");
-        redisTemplate.delete(keys);
+        redisTemplate.delete(keys);*/
+
+        // 精确清理菜品缓存数据
+        String key = "dish_" + dishDto.getCategoryId() + "_1";
+        redisTemplate.delete(key);
 
         return R.success("修改成功！");
     }
