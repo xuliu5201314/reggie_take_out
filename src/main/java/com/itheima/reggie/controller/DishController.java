@@ -90,6 +90,10 @@ public class DishController {
         // 保存
         dishService.savaWithFlavor(dishDto);
 
+        // 精确清理菜品缓存数据
+        String key = "dish_" + dishDto.getCategoryId() + "_1";
+        redisTemplate.delete(key);
+
         return R.success("新增成功！");
     }
 
