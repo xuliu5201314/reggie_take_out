@@ -28,5 +28,5 @@ mybatis-plus:
       id-type: ASSIGN_ID
 
 reggie:
-  #path: E:\JavaStudy\瑞吉外卖项目\img\
-  path: /opt/static/reggie
+  path: E:\JavaStudy\瑞吉外卖项目\img\
+  #path: /opt/static/reggie
