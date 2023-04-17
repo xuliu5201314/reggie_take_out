@@ -2,7 +2,6 @@ package com.itheima.reggie.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import javafx.scene.control.Pagination;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
