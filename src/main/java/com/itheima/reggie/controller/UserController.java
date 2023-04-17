@@ -5,8 +5,11 @@ import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.User;
 import com.itheima.reggie.service.UserService;
 
+import com.itheima.reggie.utils.SendEmailUtils;
 import com.itheima.reggie.utils.ValidateCodeUtils;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @Slf4j
 @RequestMapping("/user")
+@Api( tags = "用户相关接口")
 public class UserController {
     @Autowired
     private UserService userService;
@@ -30,6 +34,7 @@ public class UserController {
     @Autowired
     private RedisTemplate redisTemplate;
 
+    @ApiOperation("登录验证码接口")
     @PostMapping("/sendMsg")
     public R<String> sendMsg(@RequestBody User user, HttpSession session){
         // 获取手机号
@@ -42,14 +47,16 @@ public class UserController {
             // 调用阿里云短信服务
             //SMSUtils.sendMessage("阿里云短信测试","SMS_154950909",phone,code);
 
+            // 调用邮件工具类，发送验证码
+            SendEmailUtils.sendAuthCodeEmail(phone,code);
+
             // 需要将生成的验证码保存到session
             //session.setAttribute(phone,code);
 
             // 将生成的代码缓存到redis中，有效期5分钟
             redisTemplate.opsForValue().set(phone,code,5, TimeUnit.MINUTES);
 
-
-            return R.success("手机短信验证码发送成功");
+            return R.success("短信验证码发送成功");
         }
 
         return R.error("短信发送失败！");

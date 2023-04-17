@@ -1,5 +1,6 @@
 package com.itheima.reggie.common;
 
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Map;
  * @param <T>
  */
 @Data
+@ApiModel("返回值")
 public class R<T> implements Serializable {
 
     private Integer code; //编码：1成功，0和其它数字为失败
