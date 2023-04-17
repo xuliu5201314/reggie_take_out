@@ -48,7 +48,8 @@
         console.log('---/backend/page/login/login.html---')
         localStorage.removeItem('userInfo')
         //window.top.location.href = './page/login/login.html'
-        window.top.location.href = '../login/login.html'
+        //window.top.location.href = '../login/login.html'
+        window.top.location.href = '/backend/page/login/login.html'
       } else {
         return res.data
       }
