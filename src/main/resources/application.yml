@@ -29,4 +29,4 @@ mybatis-plus:
 
 reggie:
   # path: E:\JavaStudy\瑞吉外卖项目\img\
-    path: /opt/static/reggie
+    path: /opt/static/reggie/
